@@ -52,6 +52,29 @@ variables <- c("Ta","Tx","Tm","Rf","rH","Sh","aH","latitude","longitude")
 clim_ts <- lapply(provinces_meteo,function(v) as.data.frame(sapply(variables,function(x)select_variable(x,v))))
 names(clim_ts) <- provinces_meteo
 
+cal_dis_eucl <- function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
+
+causality_result_1 <- NULL
+causality_result_2 <- NULL
+causality_result_3 <- NULL
+causality_result_4 <- NULL
+causality_result_5 <- NULL
+causality_result_6 <- NULL
+causality_result_7 <- NULL
+
+sig_level = 0.05
+tmp = 1:64
+excl = c(26,27, 28, 34, 35)
+tmp = tmp[!(tmp %in% excl)]
+
+# paramètre indique la longueur de la fenetre
+fenetre_long <- 12 * 6 # unité = mois, modifie nombre d'année
+
+# paramètre indique le décalage de la fenetre
+fenetre_lag <- 3# unité = mois
+
+num_rep <- seq(1,144 - fenetre_long + fenetre_lag, by = fenetre_lag)
+
 
 
 
