@@ -66,7 +66,7 @@ tmp = tmp[!(tmp %in% excl)]
 fenetre_long <- 12 * 6 # unité = mois, modifie nombre d'année
 
 # paramètre indique le décalage de la fenetre
-fenetre_lag <- 1# unité = mois
+fenetre_lag <- 6 # unité = mois
 
 num_rep <- seq(1,144 - fenetre_long + fenetre_lag, by = fenetre_lag)
 
@@ -215,18 +215,43 @@ for (t in num_rep)
   causality_result_7$`F-Test` <- NULL
   causality_result_7$V3 <- NULL
   
+  
   colum <- NULL
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_1$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_2$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_3$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_4$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_5$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_6$V4)),na.rm = TRUE))
-  colum <- rbind(colum,sum(as.numeric(as.character(causality_result_7$V4)),na.rm = TRUE))
+  colum <- cbind(colum,as.numeric(as.character(causality_result_1$V4)))
+  
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_1$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_2$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_3$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_4$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_5$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_6$V4)),na.rm = TRUE))
+#   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_7$V4)),na.rm = TRUE))
   
   matrix_result <- cbind(matrix_result,colum)
   
 }
+
+rownames(matrix_result ) <- causality_result_1$V1
+rs <- rowSums(matrix_result)
+matrix_result1 <- matrix_result
+matrix_result1 <- cbind(matrix_result1,rs)
+matrix_result1 <- matrix_result1[order(-rs),]
+matrix_result1 <- subset(matrix_result1, select =  - rs)
+
+
+
+for (i in seq(1,nrow(matrix_result1), by = 1) )
+{
+  for (j in seq(1, ncol(matrix_result1)  , by = 1)     )
+  {
+    ifelse(matrix_result1[i,j] == 1, matrix_result1[i,j] <-  i,matrix_result1[i,j] <- NA  )
+  }
+  
+}
+
+
+
+
 date_begin_seq1 <- as.Date("1998/01/01")
 date_begin_seq2 <- date_begin_seq1
 month(date_begin_seq2) <- month(date_begin_seq2) + fenetre_long - 1
@@ -240,9 +265,16 @@ for ( l in  temp)
   time_seq[l] <- paste(time_seq1[l], time_seq2[l], sep = " - ")
 }
 
-matplot(t(matrix_result),type = "l",
-        main = "Number of Provinces has significative with DHF in Vietnam",
-        xlab = "", ylab = "Number of Provinces", xaxt = "n" )
+
+
+matplot(t(matrix_result1),type = "p",
+        main = "Frequences of Provinces has significative with DHF in Vietnam",
+        xlab = "", ylab = "", xaxt = "n" , pch = 15, cex = 1.5, yaxt = "n", col = "red")
 axis(1, at = temp, label = FALSE , cex.axis = 0.6)
+axis(2, at = seq(1,nrow(matrix_result1), by = 1), label = rownames(matrix_result1) , cex.axis = 0.5, las = 2)
+abline(h =seq(1,nrow(matrix_result1), by = 1), col="darkgray", lty="dotted")
 text(x=temp, y=par()$usr[3]-1,
      labels=time_seq, srt=60, adj=1, xpd=TRUE, cex = 0.6)
+
+
+
