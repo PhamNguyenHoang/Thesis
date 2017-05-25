@@ -66,12 +66,18 @@ tmp = tmp[!(tmp %in% excl)]
 fenetre_long <- 12 * 6 # unité = mois, modifie nombre d'année
 
 # paramètre indique le décalage de la fenetre
-fenetre_lag <- 6 # unité = mois
+fenetre_lag <- 1  # unité = mois
 
 num_rep <- seq(1,144 - fenetre_long + fenetre_lag, by = fenetre_lag)
 
 #matrix stocke les resultats
-matrix_result <- NULL
+matrix_result1 <- NULL
+matrix_result2 <- NULL
+matrix_result3 <- NULL
+matrix_result4 <- NULL
+matrix_result5 <- NULL
+matrix_result6 <- NULL
+matrix_result7 <- NULL
 
 for (t in num_rep)
 {
@@ -216,9 +222,21 @@ for (t in num_rep)
   causality_result_7$V3 <- NULL
   
   
-  colum <- NULL
-  colum <- cbind(colum,as.numeric(as.character(causality_result_1$V4)))
+  colum1 <- NULL
+  colum2 <- NULL
+  colum3 <- NULL
+  colum4 <- NULL
+  colum5 <- NULL
+  colum6 <- NULL
+  colum7 <- NULL
   
+  colum1 <- cbind(colum1,as.numeric(as.character(causality_result_1$V4)))
+  colum2 <- cbind(colum2,as.numeric(as.character(causality_result_2$V4)))
+  colum3 <- cbind(colum3,as.numeric(as.character(causality_result_3$V4)))
+  colum4 <- cbind(colum4,as.numeric(as.character(causality_result_4$V4)))
+  colum5 <- cbind(colum5,as.numeric(as.character(causality_result_5$V4)))
+  colum6 <- cbind(colum6,as.numeric(as.character(causality_result_6$V4)))
+  colum7 <- cbind(colum7,as.numeric(as.character(causality_result_7$V4)))
 #   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_1$V4)),na.rm = TRUE))
 #   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_2$V4)),na.rm = TRUE))
 #   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_3$V4)),na.rm = TRUE))
@@ -227,24 +245,51 @@ for (t in num_rep)
 #   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_6$V4)),na.rm = TRUE))
 #   colum <- rbind(colum,sum(as.numeric(as.character(causality_result_7$V4)),na.rm = TRUE))
   
-  matrix_result <- cbind(matrix_result,colum)
+  matrix_result1 <- cbind(matrix_result1,colum1)
+  matrix_result2 <- cbind(matrix_result2,colum2)
+  matrix_result3 <- cbind(matrix_result3,colum3)
+  matrix_result4 <- cbind(matrix_result4,colum4)
+  matrix_result5 <- cbind(matrix_result5,colum5)
+  matrix_result6 <- cbind(matrix_result6,colum6)
+  matrix_result7 <- cbind(matrix_result7,colum7)
   
 }
 
-rownames(matrix_result ) <- causality_result_1$V1
-rs <- rowSums(matrix_result)
-matrix_result1 <- matrix_result
-matrix_result1 <- cbind(matrix_result1,rs)
-matrix_result1 <- matrix_result1[order(-rs),]
-matrix_result1 <- subset(matrix_result1, select =  - rs)
 
 
+rownames(matrix_result1) <- causality_result_1$V1
+rownames(matrix_result2) <- causality_result_1$V1
+rownames(matrix_result3) <- causality_result_1$V1
+rownames(matrix_result4) <- causality_result_1$V1
+rownames(matrix_result5) <- causality_result_1$V1
+rownames(matrix_result6) <- causality_result_1$V1
+rownames(matrix_result7) <- causality_result_1$V1
 
-for (i in seq(1,nrow(matrix_result1), by = 1) )
+rs <- NULL
+##classify by frequence
+##rs <- rowSums(matrix_result7)
+
+##classify by lattitude
+
+for (i in tmp)
 {
-  for (j in seq(1, ncol(matrix_result1)  , by = 1)     )
+  rs <- rbind(rs,mean(vn@polygons[[as.numeric(i)]]@Polygons[[1]]@coords[,2]))
+}
+
+
+matrix_result_temp <- matrix_result7
+
+matrix_result_temp <- cbind(matrix_result_temp,rs)
+matrix_result_temp <- matrix_result_temp[order(rs),]
+#matrix_result_temp <- subset(matrix_result_temp, select =  - rs)
+
+
+
+for (i in seq(1,nrow(matrix_result_temp), by = 1) )
+{
+  for (j in seq(1, ncol(matrix_result_temp)  , by = 1)     )
   {
-    ifelse(matrix_result1[i,j] == 1, matrix_result1[i,j] <-  i,matrix_result1[i,j] <- NA  )
+    ifelse(matrix_result_temp[i,j] == 1, matrix_result_temp[i,j] <-  i,matrix_result_temp[i,j] <- NA  )
   }
   
 }
@@ -267,12 +312,12 @@ for ( l in  temp)
 
 
 
-matplot(t(matrix_result1),type = "p",
-        main = "Frequences of Provinces has significative with DHF in Vietnam",
-        xlab = "", ylab = "", xaxt = "n" , pch = 15, cex = 1.5, yaxt = "n", col = "red")
+matplot(t(matrix_result_temp),type = "p",
+        main = "Frequences of Provinces has significative between DHF and Absolute Humidity in Vietnam classify by latitude",
+        xlab = "", ylab = "", xaxt = "n" , pch = 15, cex = 1.0, yaxt = "n", col = "red")
 axis(1, at = temp, label = FALSE , cex.axis = 0.6)
-axis(2, at = seq(1,nrow(matrix_result1), by = 1), label = rownames(matrix_result1) , cex.axis = 0.5, las = 2)
-abline(h =seq(1,nrow(matrix_result1), by = 1), col="darkgray", lty="dotted")
+axis(2, at = seq(1,nrow(matrix_result_temp), by = 1), label = rownames(matrix_result_temp) , cex.axis = 0.5, las = 2)
+abline(h =seq(1,nrow(matrix_result_temp), by = 1), col="darkgray", lty="dotted")
 text(x=temp, y=par()$usr[3]-1,
      labels=time_seq, srt=60, adj=1, xpd=TRUE, cex = 0.6)
 
