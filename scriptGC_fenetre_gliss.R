@@ -312,6 +312,10 @@ for ( l in  temp)
 
 
 
+
+
+
+
 matplot(t(matrix_result_temp),type = "p",
         main = "Frequences of Provinces has significative between DHF and Absolute Humidity in Vietnam classify by latitude",
         xlab = "", ylab = "", xaxt = "n" , pch = 15, cex = 1.0, yaxt = "n", col = "red")
