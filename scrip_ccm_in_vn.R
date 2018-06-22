@@ -18,6 +18,7 @@ library(multispatialCCM)
 
 load("climatic_data_Vietnam_Laos_Thailand.rdata")
 load("demo_meteo.RData")
+load("climatic_data.RData")
 main_data <- read.csv("main_data_for_kmeans.csv", row.names = 1)
 load("VNM_adm2.RData", vn <- new.env())
 vn <- vn$gadm

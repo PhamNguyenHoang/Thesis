@@ -338,10 +338,24 @@ ccm_apply_surr <- function (num_prov, num_clim)
   return(data.result.ccm.surr)
 }
 
-num_surr = 50
-result <- lapply(tmp, function(x) ccm_apply(x,7))
-result_surr <- lapply(tmp, function(x) ccm_apply_surr(x,7))
+num_surr = 100
+# result <- lapply(tmp, function(x) ccm_apply(x,7))
+# result_surr <- lapply(tmp, function(x) ccm_apply_surr(x,7))
 
+result1 <- lapply(tmp, function(x) ccm_apply(x,1))
+result_surr1 <- lapply(tmp, function(x) ccm_apply_surr(x,1))
+
+result4 <- lapply(tmp, function(x) ccm_apply(x,4))
+result_surr4 <- lapply(tmp, function(x) ccm_apply_surr(x,4))
+
+result5 <- lapply(tmp, function(x) ccm_apply(x,5))
+result_surr5 <- lapply(tmp, function(x) ccm_apply_surr(x,5))
+
+result6 <- lapply(tmp, function(x) ccm_apply(x,6))
+result_surr6 <- lapply(tmp, function(x) ccm_apply_surr(x,6))
+
+result7 <- lapply(tmp, function(x) ccm_apply(x,7))
+result_surr7 <- lapply(tmp, function(x) ccm_apply_surr(x,7))
     
 ## Classify by lattitude
 rs <- NULL
@@ -352,6 +366,7 @@ for(i in tmp)
 
 rs <- as.data.frame(rs)
 rs$rank <-  rank(as.numeric(as.character(rs$V2)), ties.method = "first")
+
 rho <- NULL
 for(j in seq(1,NROW(rs),by =  1) )
 {
@@ -362,26 +377,65 @@ rs <- cbind(rs,rho)
 rs$V1 <- as.character(rs$V1)
 rs$V2 <- as.numeric(as.character(rs$V2))
 
-sum <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+# sum1 <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+# sum4 <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+# sum5 <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+# sum6 <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+# sum7 <- data.frame(count = numeric(NROW(rs)), pvalue =  numeric(NROW(rs))   )
+
+sum1 <- data.frame( pvalue =  numeric(NROW(rs))   )
+sum4 <- data.frame( pvalue =  numeric(NROW(rs))   )
+sum5 <- data.frame( pvalue =  numeric(NROW(rs))   )
+sum6 <- data.frame( pvalue =  numeric(NROW(rs))   )
+sum7 <- data.frame( pvalue =  numeric(NROW(rs))   )
 
 
 for (t in seq(1,NROW(rs),by =  1))
 {
-  sum$count[t] = 1
+  sum1$count[t] = 1
+  sum4$count[t] = 1
+  sum5$count[t] = 1
+  sum6$count[t] = 1
+  sum7$count[t] = 1
   for ( k in seq(1, num_surr, by = 1))
   {
-    if(result_surr[[t]]$rho[k] > result[[t]]$rho)
-      sum$count[t] <- sum$count[t] + 1
+    if(result_surr1[[t]]$rho[k] > result1[[t]]$rho)
+    {sum1$count[t] <- sum1$count[t] + 1}
+    
+    if(result_surr4[[t]]$rho[k] > result4[[t]]$rho)
+    {sum4$count[t] <- sum4$count[t] + 1}
+    
+    if(result_surr5[[t]]$rho[k] > result5[[t]]$rho)
+    {sum5$count[t] <- sum5$count[t] + 1}
+    
+    if(result_surr6[[t]]$rho[k] > result6[[t]]$rho)
+    {sum6$count[t] <- sum6$count[t] + 1}
+    
+    if(result_surr7[[t]]$rho[k] > result7[[t]]$rho)
+    {sum7$count[t] <- sum7$count[t] + 1}
       
   }
 }
 
 for (t in seq(1,NROW(rs),by =  1))
 {
-  sum$pvalue[t] <- sum$count[t]/(num_surr+1)
+  sum1$pvalue[t] <- sum1$count[t]/(num_surr+1)
+  sum4$pvalue[t] <- sum4$count[t]/(num_surr+1)
+  sum5$pvalue[t] <- sum5$count[t]/(num_surr+1)
+  sum6$pvalue[t] <- sum6$count[t]/(num_surr+1)
+  sum7$pvalue[t] <- sum7$count[t]/(num_surr+1)
 }
 
+# for (t in seq(1,NROW(rs),by =  1))
+# {
+#   sum1$pvalue[t] <- abs(result1[[t]]$rho - mean(result_surr1[[t]]$rho))/sd(result_surr1[[t]]$rho)
+#   sum4$pvalue[t] <- abs(result4[[t]]$rho - mean(result_surr4[[t]]$rho))/sd(result_surr4[[t]]$rho)
+#   sum5$pvalue[t] <- abs(result5[[t]]$rho - mean(result_surr5[[t]]$rho))/sd(result_surr5[[t]]$rho)
+#   sum6$pvalue[t] <- abs(result6[[t]]$rho - mean(result_surr6[[t]]$rho))/sd(result_surr6[[t]]$rho)
+#   sum7$pvalue[t] <- abs(result7[[t]]$rho - mean(result_surr7[[t]]$rho))/sd(result_surr7[[t]]$rho)
+# }
 
+#abs(result1[[1]]$rho - mean(result_surr1[[1]]$rho))/sd(result_surr1[[1]]$rho)
 
 
 # rs <- rbind(rs, c(vn@data$VARNAME_2[as.numeric(26)], 0, "NA", "NA" ))
@@ -401,73 +455,153 @@ for (t in seq(1,NROW(rs),by =  1))
 # 
 # spplot(vn1,13,col.regions=colorRampPalette(brewer.pal(9, "YlOrRd"))(10), at = seq(0,1, by = 0.1),
 #        main = "Rainfall")
+vis1 <- NULL
+vis4 <- NULL
+vis5 <- NULL
+vis6 <- NULL
+vis7 <- NULL
 
-boxplot(result_surr[[1]]$rho, 
-        result_surr[[2]]$rho, 
-        result_surr[[3]]$rho,
-        result_surr[[4]]$rho,
-        result_surr[[5]]$rho,
-        result_surr[[6]]$rho,
-        result_surr[[7]]$rho,
-        result_surr[[8]]$rho,
-        result_surr[[9]]$rho,
-        result_surr[[10]]$rho,
-        result_surr[[11]]$rho,
-        result_surr[[12]]$rho,
-        result_surr[[13]]$rho,
-        result_surr[[14]]$rho,
-        result_surr[[15]]$rho,
-        result_surr[[16]]$rho,
-        result_surr[[17]]$rho,
-        result_surr[[18]]$rho,
-        result_surr[[19]]$rho,
-        result_surr[[20]]$rho,
-        result_surr[[21]]$rho,
-        result_surr[[22]]$rho,
-        result_surr[[23]]$rho,
-        result_surr[[24]]$rho,
-        result_surr[[25]]$rho,
-        result_surr[[26]]$rho,
-        result_surr[[27]]$rho,
-        result_surr[[28]]$rho,
-        result_surr[[29]]$rho,
-        result_surr[[30]]$rho,
-        result_surr[[31]]$rho,
-        result_surr[[32]]$rho,
-        result_surr[[33]]$rho,
-        result_surr[[34]]$rho,
-        result_surr[[35]]$rho,
-        result_surr[[36]]$rho,
-        result_surr[[37]]$rho,
-        result_surr[[38]]$rho,
-        result_surr[[39]]$rho,
-        result_surr[[40]]$rho,
-        result_surr[[41]]$rho,
-        result_surr[[42]]$rho,
-        result_surr[[43]]$rho,
-        result_surr[[44]]$rho,
-        result_surr[[45]]$rho,
-        result_surr[[46]]$rho,
-        result_surr[[47]]$rho,
-        result_surr[[48]]$rho,
-        result_surr[[49]]$rho,
-        result_surr[[50]]$rho,
-        result_surr[[51]]$rho,
-        result_surr[[52]]$rho,
-        result_surr[[53]]$rho,
-        result_surr[[54]]$rho,
-        result_surr[[55]]$rho,
-        result_surr[[56]]$rho,
-        result_surr[[57]]$rho,
-        result_surr[[58]]$rho,
-        result_surr[[59]]$rho,
-        ylim = c(0,1),
-        main = "Absolute Humidity",
+for(i in seq(1, 59, by=1))
+{
+  vis1 <- cbind(vis1,result_surr1[[i]]$rho)
+  vis4 <- cbind(vis4,result_surr4[[i]]$rho)
+  vis5 <- cbind(vis5,result_surr5[[i]]$rho)
+  vis6 <- cbind(vis6,result_surr6[[i]]$rho)
+  vis7 <- cbind(vis7,result_surr7[[i]]$rho)
+  
+}
+
+prov_list <- rs$V1
+prov_list[16] <- "Hai Phong"
+prov_list[18] <- "Ha Noi"
+prov_list[32] <- "Vung Tau"
+prov_list[36] <- "Ho Chi Minh"
+prov_list[43] <- "Hue"
+prov_list[45] <- "Da Nang"
+prov_list[55] <- "Dac Lac"
+
+layout(matrix(c(1,2,3,4,5), 1,5, byrow = TRUE))
+
+boxplot(vis1, ylim = c(0,1),
+        main = "Average Temperature",
         at = rs$rank,
-        names = rs$V1,
+        names = prov_list,
         las = 2,
         horizontal = TRUE,
-        cex = 0.5, cex.axis = 0.5)
+        cex = 0.7, cex.axis = 0.65, xaxt = "n")
+axis(1, at = seq(0,1, by = 0.2), cex.axis = 0.9 )
+for(i in seq(1,59, by = 1))
+{
+  if(sum1$pvalue[i] <= 0.05)
+  {
+    points(result1[[i]]$rho,rs$rank[i], pch = 19, col = "red",cex = 0.8) 
+  }
+  
+  else
+  {
+    points(result1[[i]]$rho,rs$rank[i], pch = 19, col = "green",cex = 0.8)   
+  }
+  
+  abline( h = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( v = 0.5, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+
+boxplot(vis4, ylim = c(0,1),
+        main = "Rainfall",
+        at = rs$rank,
+        las = 2,
+        horizontal = TRUE,cex = 0.7, xaxt = "n", yaxt = "n")
+axis(1, at = seq(0,1, by = 0.2), cex.axis = 0.9 )
+for(i in seq(1,59, by = 1))
+{
+  if(sum4$pvalue[i] <= 0.05)
+  {
+    points(result4[[i]]$rho,rs$rank[i], pch = 19, col = "red",cex = 0.8) 
+  }
+  
+  else
+  {
+    points(result4[[i]]$rho,rs$rank[i], pch = 19, col = "green",cex = 0.8)   
+  }
+  abline( h = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( v = 0.5, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+
+boxplot(vis5, ylim = c(0,1),
+        main = "Relative Humidity",
+        at = rs$rank,
+        las = 2,
+        horizontal = TRUE,cex = 0.7, xaxt = "n", yaxt = "n")
+axis(1, at = seq(0,1, by = 0.2), cex.axis = 0.9 )
+for(i in seq(1,59, by = 1))
+{
+  if(sum5$pvalue[i] <= 0.05)
+  {
+    points(result5[[i]]$rho,rs$rank[i], pch = 19, col = "red",cex = 0.8) 
+  }
+  
+  else
+  {
+    points(result5[[i]]$rho,rs$rank[i], pch = 19, col = "green",cex = 0.8)   
+  }
+  abline( h = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+
+boxplot(vis6, ylim = c(0,1),
+        main = "Hours of sunshine",
+        at = rs$rank,
+        las = 2,
+        horizontal = TRUE,cex = 0.7, xaxt = "n", yaxt = "n")
+axis(1, at = seq(0,1, by = 0.2), cex.axis = 0.9 )
+for(i in seq(1,59, by = 1))
+{
+  if(sum6$pvalue[i] <= 0.05)
+  {
+    points(result6[[i]]$rho,rs$rank[i], pch = 19, col = "red",cex = 0.8) 
+  }
+  
+  else
+  {
+    points(result6[[i]]$rho,rs$rank[i], pch = 19, col = "green",cex = 0.8)   
+  }
+  abline( h = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( v = 0.5, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+
+boxplot(vis7, ylim = c(0,1),
+        main = "Absolute Humidity",
+        at = rs$rank,
+        las = 2,
+        horizontal = TRUE,cex = 0.7, xaxt = "n", yaxt = "n")
+axis(1, at = seq(0,1, by = 0.2), cex.axis = 0.9 )
+for(i in seq(1,59, by = 1))
+{
+  if(sum7$pvalue[i] <= 0.05)
+  {
+    points(result7[[i]]$rho,rs$rank[i], pch = 19, col = "red",cex = 0.8) 
+  }
+  
+  else
+  {
+    points(result7[[i]]$rho,rs$rank[i], pch = 19, col = "green",cex = 0.8)   
+  }
+  abline( h = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( v = 0.5, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+
+
+#########
+# Calculate Pvalues by Fisher methods
+sumlog(sum1$pvalue)
+sumlog(sum4$pvalue)
+sumlog(sum5$pvalue)
+sumlog(sum6$pvalue)
+sumlog(sum7$pvalue)
+
+
+
+
+#################
 
 for(i in seq(1,59, by = 1))
 {
@@ -837,8 +971,8 @@ excl1 = c(26,27, 28, 34, 35, 58)
 tmp1 = tmp1[!(tmp1 %in% excl1)]
 
 result_multi1 <- sapply(tmp1, function(x) multivariableEDM(x, 1))
-result_multi2 <- sapply(tmp1, function(x) multivariableEDM(x, 2))
-result_multi3 <- sapply(tmp1, function(x) multivariableEDM(x, 3))
+#result_multi2 <- sapply(tmp1, function(x) multivariableEDM(x, 2))
+#result_multi3 <- sapply(tmp1, function(x) multivariableEDM(x, 3))
 result_multi4 <- sapply(tmp1, function(x) multivariableEDM(x, 4))
 result_multi5 <- sapply(tmp1, function(x) multivariableEDM(x, 5))
 result_multi6 <- sapply(tmp1, function(x) multivariableEDM(x, 6))
@@ -1019,11 +1153,194 @@ result_multi17_s <- result_multi17 %>% filter(V2 < 25)
 result_multi17_c <- result_multi17 %>% filter(25 <= V2) %>% filter(V2 < 40)
 result_multi17_n <- result_multi17 %>% filter(V2 >= 40)
 
-opar <- par(no.readonly=TRUE)
-par(mfrow=c(1,4))
+
+vis_global <- NULL
+vis_nor <- NULL
+vis_cen <- NULL
+vis_sud <- NULL
+
+vis_global <- cbind(vis_global, result_multi1[,1])
+vis_global <- cbind(vis_global, result_multi4[,1])
+vis_global <- cbind(vis_global, result_multi5[,1])
+vis_global <- cbind(vis_global, result_multi6[,1])
+vis_global <- cbind(vis_global, result_multi7[,1])
+vis_global <- cbind(vis_global, result_multi8[,1])
+vis_global <- cbind(vis_global, result_multi9[,1])
+vis_global <- cbind(vis_global, result_multi10[,1])
+vis_global <- cbind(vis_global, result_multi11[,1])
+vis_global <- cbind(vis_global, result_multi12[,1])
+vis_global <- cbind(vis_global, result_multi13[,1])
+vis_global <- cbind(vis_global, result_multi14[,1])
+vis_global <- cbind(vis_global, result_multi15[,1])
+vis_global <- cbind(vis_global, result_multi16[,1])
+vis_global <- cbind(vis_global, result_multi17[,1])
+
+vis_nor <- cbind(vis_nor, result_multi1_n[,1])
+vis_nor <- cbind(vis_nor, result_multi4_n[,1])
+vis_nor <- cbind(vis_nor, result_multi5_n[,1])
+vis_nor <- cbind(vis_nor, result_multi6_n[,1])
+vis_nor <- cbind(vis_nor, result_multi7_n[,1])
+vis_nor <- cbind(vis_nor, result_multi8_n[,1])
+vis_nor <- cbind(vis_nor, result_multi9_n[,1])
+vis_nor <- cbind(vis_nor, result_multi10_n[,1])
+vis_nor <- cbind(vis_nor, result_multi11_n[,1])
+vis_nor <- cbind(vis_nor, result_multi12_n[,1])
+vis_nor <- cbind(vis_nor, result_multi13_n[,1])
+vis_nor <- cbind(vis_nor, result_multi14_n[,1])
+vis_nor <- cbind(vis_nor, result_multi15_n[,1])
+vis_nor <- cbind(vis_nor, result_multi16_n[,1])
+vis_nor <- cbind(vis_nor, result_multi17_n[,1])
+
+vis_cen <- cbind(vis_cen, result_multi1_c[,1])
+vis_cen <- cbind(vis_cen, result_multi4_c[,1])
+vis_cen <- cbind(vis_cen, result_multi5_c[,1])
+vis_cen <- cbind(vis_cen, result_multi6_c[,1])
+vis_cen <- cbind(vis_cen, result_multi7_c[,1])
+vis_cen <- cbind(vis_cen, result_multi8_c[,1])
+vis_cen <- cbind(vis_cen, result_multi9_c[,1])
+vis_cen <- cbind(vis_cen, result_multi10_c[,1])
+vis_cen <- cbind(vis_cen, result_multi11_c[,1])
+vis_cen <- cbind(vis_cen, result_multi12_c[,1])
+vis_cen <- cbind(vis_cen, result_multi13_c[,1])
+vis_cen <- cbind(vis_cen, result_multi14_c[,1])
+vis_cen <- cbind(vis_cen, result_multi15_c[,1])
+vis_cen <- cbind(vis_cen, result_multi16_c[,1])
+vis_cen <- cbind(vis_cen, result_multi17_c[,1])
+
+vis_sud <- cbind(vis_sud, result_multi1_s[,1])
+vis_sud <- cbind(vis_sud, result_multi4_s[,1])
+vis_sud <- cbind(vis_sud, result_multi5_s[,1])
+vis_sud <- cbind(vis_sud, result_multi6_s[,1])
+vis_sud <- cbind(vis_sud, result_multi7_s[,1])
+vis_sud <- cbind(vis_sud, result_multi8_s[,1])
+vis_sud <- cbind(vis_sud, result_multi9_s[,1])
+vis_sud <- cbind(vis_sud, result_multi10_s[,1])
+vis_sud <- cbind(vis_sud, result_multi11_s[,1])
+vis_sud <- cbind(vis_sud, result_multi12_s[,1])
+vis_sud <- cbind(vis_sud, result_multi13_s[,1])
+vis_sud <- cbind(vis_sud, result_multi14_s[,1])
+vis_sud <- cbind(vis_sud, result_multi15_s[,1])
+vis_sud <- cbind(vis_sud, result_multi16_s[,1])
+vis_sud <- cbind(vis_sud, result_multi17_s[,1])
+
+
+colnames(vis_global) <- c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah")
+
+colnames(vis_nor) <- c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah")
+
+colnames(vis_cen) <- c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah")
+
+colnames(vis_sud) <- c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah")
+
+
+pval <- NULL
+pval_n <- NULL
+pval_c <- NULL
+pval_s <- NULL
+for(i in 1:15)
+{
+  p <- t.test(vis_global[,i], mu = 0)
+  p_n <- t.test(vis_nor[,i], mu = 0)
+  p_c <- t.test(vis_cen[,i], mu = 0)
+  p_s <- t.test(vis_sud[,i], mu = 0)
+  pval <- cbind(pval,p$p.value)
+  pval_n <- cbind(pval_n,p_n$p.value)
+  pval_c <- cbind(pval_c,p_c$p.value)
+  pval_s <- cbind(pval_s,p_s$p.value)
+}
+
+vis_global <- rbind(vis_global,pval)
+vis_nor <- rbind(vis_nor,pval_n)
+vis_cen <- rbind(vis_cen,pval_c)
+vis_sud <- rbind(vis_sud,pval_s)
+
+vis_global2 <- vis_global[,order(vis_global[length(vis_global[,1]),])]
+vis_nor2 <- vis_nor[,order(vis_nor[length(vis_nor[,1]),])]
+vis_cen2 <- vis_cen[,order(vis_cen[length(vis_cen[,1]),])]
+vis_sud2 <- vis_sud[,order(vis_sud[length(vis_sud[,1]),])]
+
+
+vis_global2 <- vis_global2[-length(vis_nor[,1]),] 
+vis_nor2 <- vis_nor2[-length(vis_cen[,1]),] 
+vis_cen2 <- vis_cen2[-length(vis_cen[,1]),] 
+vis_sud2 <- vis_sud2[-length(vis_sud[,1]),] 
+
+#Plotting
+
+layout(matrix(c(1,2,3,4), 1,4, byrow = TRUE))
+boxplot(vis_global2,
+        ylim = c(-0.6, 0.6),
+        main = "Global of Vietnam",
+        at = 1:15,
+        names = colnames(vis_global2),
+        las = 2,
+        horizontal = FALSE,
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
+
+boxplot(vis_nor2,
+        ylim = c(-0.6, 0.6),
+        main = "North of Vietnam",
+        at = 1:15,
+        names = colnames(vis_nor2),
+        las = 2,
+        horizontal = FALSE,
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
+
+boxplot(vis_cen2,
+        ylim = c(-0.6, 0.6),
+        main = "Centre of Vietnam",
+        at = 1:15,
+        names = colnames(vis_cen2),
+        las = 2,
+        horizontal = FALSE,
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
+
+boxplot(vis_sud2,
+        ylim = c(-0.6, 0.6),
+        main = "South of Vietnam",
+        at = 1:15,
+        names = colnames(vis_sud2),
+        las = 2,
+        horizontal = FALSE,
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
+
+############################################################
+
+#pval <- t.test(result_multi1$result_multi1, mu = 0)
+# opar <- par(no.readonly=TRUE)
+# par(mfrow=c(1,4))
+layout(matrix(c(1,2,3,4), 1,4, byrow = TRUE))
 boxplot(result_multi1[,1], 
-        result_multi2[,1], 
-        result_multi3[,1],
+#         result_multi2[,1], 
+#         result_multi3[,1],
         result_multi4[,1],
         result_multi5[,1],
         result_multi6[,1],
@@ -1040,15 +1357,22 @@ boxplot(result_multi1[,1],
         result_multi17[,1],
         ylim = c(-0.6, 0.6),
         main = "Global of Vietnam",
-        at = 1:17,
-        names = c("ta","tx","tm","rf","rh","ah","sh","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
-        las = 1,
+        at = 1:15,
+        names = c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
+        las = 2,
         horizontal = FALSE,
-        cex = 0.5, cex.axis = 0.5)
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
 
 boxplot(result_multi1_n[,1], 
-        result_multi2_n[,1], 
-        result_multi3_n[,1],
+#         result_multi2_n[,1], 
+#         result_multi3_n[,1],
         result_multi4_n[,1],
         result_multi5_n[,1],
         result_multi6_n[,1],
@@ -1065,15 +1389,21 @@ boxplot(result_multi1_n[,1],
         result_multi17_n[,1],
         ylim = c(-0.6, 0.6),
         main = "North of Vietnam",
-        at = 1:17,
-        names = c("ta","tx","tm","rf","rh","ah","sh","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
-        las = 1,
+        at = 1:15,
+        names = c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
+        las = 2,
         horizontal = FALSE,
-        cex = 0.5, cex.axis = 0.5)
+        cex = 0.7, cex.axis = 1.2)
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
 
 boxplot(result_multi1_c[,1], 
-        result_multi2_c[,1], 
-        result_multi3_c[,1],
+#         result_multi2_c[,1], 
+#         result_multi3_c[,1],
         result_multi4_c[,1],
         result_multi5_c[,1],
         result_multi6_c[,1],
@@ -1090,15 +1420,22 @@ boxplot(result_multi1_c[,1],
         result_multi17_c[,1],
         ylim = c(-0.6, 0.6),
         main = "Centre of Vietnam",
-        at = 1:17,
-        names = c("ta","tx","tm","rf","rh","ah","sh","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
-        las = 1,
+        at = 1:15,
+        names = c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
+        las = 2,
         horizontal = FALSE,
-        cex = 0.5, cex.axis = 0.5)
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
 
 boxplot(result_multi1_s[,1], 
-        result_multi2_s[,1], 
-        result_multi3_s[,1],
+#         result_multi2_s[,1], 
+#         result_multi3_s[,1],
         result_multi4_s[,1],
         result_multi5_s[,1],
         result_multi6_s[,1],
@@ -1115,18 +1452,24 @@ boxplot(result_multi1_s[,1],
         result_multi17_s[,1],
         ylim = c(-0.6, 0.6),
         main = "South of Vietnam",
-        at = 1:17,
-        names = c("ta","tx","tm","rf","rh","ah","sh","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
-        las = 1,
+        at = 1:15,
+        names = c("ta","rf","rh","sh","ah","ta-rf","ta-rh","ta-sh","ta-ah","rf-rh","rf-sh","rf-ah","rh-sh","rh-ah","sh-ah"),
+        las = 2,
         horizontal = FALSE,
-        cex = 0.5, cex.axis = 0.5)
+        cex = 0.7, cex.axis = 1.2)
+
+for (i in seq(1,15, by = 1))
+{
+  abline( v = i, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+}
+abline( h = 0, col=adjustcolor("black",.5), lty=1, lwd=0.3)
+title( ylab = "Forcast Improvement"  )
+
+# par(opar)
 
 
-par(opar)
-
-
-
-
+# end of plot
+##################
 
 
 
@@ -1156,4 +1499,155 @@ boxplot(result_multi1[,1],
         horizontal = FALSE,
         cex = 0.5, cex.axis = 0.5)
 
+
+
+###########################################################################
+# Exploration Scenario 
+tp.SE <- 2
+E.SE <- 7
+theta.SE <- 0.9
+
+
+exploringMEDM <- function(num_prov, num_clim)
+{
+  vari = c(1,2,3,4,5,6,7) 
+  prov_c <- as.character(vn@data$VARNAME_2[as.numeric(num_prov)])
+  vari_c <- variables[as.numeric(vari)]
+  
+  #take a coordinate of provinces 
+  x <- mean(vn@polygons[[as.numeric(num_prov)]]@Polygons[[1]]@coords[,1]) 
+  y <- mean(vn@polygons[[as.numeric(num_prov)]]@Polygons[[1]]@coords[,2])
+  prov_coor <- cbind(x,y)
+  prov_coor <- as.data.frame(prov_coor)
+  colnames(prov_coor) <- c("longitude","latitude")
+  
+  d <- dengue_data_vn[,which( colnames(dengue_data_vn) == prov_c )]
+  
+  dis_eu <- NULL
+  for ( j in 1:63)
+  {
+    x1 = cbind(mean(clim_ts[[j]]$longitude),mean(clim_ts[[j]]$latitude))
+    
+    a <- cal_dis_eucl(prov_coor,x1)
+    dis_eu <- rbind(dis_eu,c(a, attributes(clim_ts[j])))
+  }
+  
+  dis_eu <- as.data.frame(dis_eu)
+  dis_eu$V1 <- as.numeric(dis_eu$V1)
+  climat_result <- dis_eu[ which(dis_eu[,1] == min(dis_eu[,1]) ) , ]
+  
+  climat_data_1 <- select_variable(vari_c[num_clim],climat_result$names)
+  
+  climat_1 <- climat_data_1[49:201]
+
+
+df.in.SE <- (d = d / (mean(d,na.rm=TRUE)*365/30))
+
+block_in <- NULL
+AH <- climat_1
+block_in <- cbind(block_in, d, AH)
+
+block.SE <- make_block(block_in,c(rep(1,E.SE),2),c(tp=tp.SE,0:-(E.SE-2),0) ) %>% as.data.frame()
+block.norm.SE <- block.SE 
+for(j in 1:NCOL(block.norm.SE)) 
+  block.norm.SE[,j] <- (block.norm.SE[,j] - mean(block.norm.SE[,j], na.rm = TRUE)) / sd(block.norm.SE[,j], na.rm = TRUE) 
+
+block.norm.SE <- data.frame(time = time_seq, block.norm.SE) 
+
+dAH.norm <- dAH / sd(block.SE$AH_t,na.rm=TRUE)
+
+pred.SE <- c(1,NROW(block.SE)) 
+lib.SE <- pred.SE + NROW(block.SE)
+
+block.temp1 <- block.norm.SE %>% mutate(AH_t = AH_t + dAH.norm/2) %>% bind_rows(block.norm.SE)
+
+out <- block_lnlp(block=block.temp1, 
+                  lib = lib.SE, 
+                  pred = pred.SE,
+                  method = 's-map',
+                  tp = 0,
+                  num_neighbors = 0,
+                  columns = 1+(1:E.SE),
+                  target_column = 1,
+                  stats_only = FALSE,
+                  first_column_time = TRUE,
+                  exclusion_radius = 0,
+                  theta = theta.SE)[[1]]$model_output[1:NROW(block.SE),]
+flu.pred.pos <- out$pred
+
+
+
+pred.SE <- c(1,NROW(block.SE)) 
+
+lib.SE <- pred.SE + NROW(block.SE)
+
+block.temp2 <- block.norm.SE %>% mutate(AH_t = AH_t - dAH.norm/2) %>% bind_rows(block.norm.SE)
+
+out <- block_lnlp(block=block.temp2,
+                  lib = lib.SE,
+                  pred = pred.SE,
+                  method = 's-map',
+                  tp = 0,
+                  num_neighbors = 0,
+                  columns = 1+(1:E.SE),
+                  target_column = 1,
+                  stats_only = FALSE, 
+                  first_column_time = TRUE,
+                  exclusion_radius = 0,
+                  theta = theta.SE)[[1]]$model_output[1:NROW(block.SE),]
+flu.pred.neg <- out$pred
+dFlu.pred <- flu.pred.pos - flu.pred.neg
+dFlu.pred <- dFlu.pred * sd(block.SE$d_t+2,na.rm=TRUE)
+
+return(dFlu.pred)
+}
+dAH <- cal_delta_clim(7) # gram/m^3
+ResultEx <- sapply(tmp1, function(x) exploringMEDM(x,7))
+
+rs <- NULL
+for(i in tmp1)
+{
+  rs <- rbind(rs,c(as.character(vn@data$VARNAME_2[as.numeric(i)]),mean(vn@polygons[[as.numeric(i)]]@Polygons[[1]]@coords[,2]) ))
+}
+
+rs <- as.data.frame(rs)
+rs$rank <-  rank(as.numeric(as.character(rs$V2)), ties.method = "first")
+
+
+
+boxplot(ResultEx/dAH,xlab=NULL,ylab='dDengue/dAH',
+        ylim = c(-0.1,0.1),
+        main = "Absolute Humidity",
+        at = rs$rank,
+        names = rs$V1,
+        las = 2,
+        horizontal = FALSE,
+        cex = 0.5, cex.axis = 0.5)
+
+abline(h=0,lty=2,col='grey40') 
+
+
+
+
+
+
+
+plot(block.SE$AH_t,dFlu.pred/dAH,col=rgb(0.6, 0.6, 0.6, 0.8),xlab='AH',ylab='dFlu/dAH') 
+title(main = 'Scenario Exploration') 
+abline(h=0,lty=2,col='grey40')
+
+
+cal_delta_clim <- function(num_clim, data = clim_ts)
+{
+  temp <- NULL
+  for(i in 1 : NROW(clim_ts) )
+  {
+    a <- sd(as.matrix(clim_ts[[i]][num_clim]), na.rm = TRUE )
+    temp <- rbind(temp, a)
+  }
+  
+  return (mean(temp,na.rm = TRUE)*5/100  )
+  
+}
+cal_delta_clim(4)
 

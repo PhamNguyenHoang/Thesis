@@ -202,3 +202,74 @@
   
   
   
+  ###Test exploration 
+  
+  df.long <- read.csv("DataCCM.txt",header = TRUE)
+  
+  df.long <- df.long %>% filter(country == 'Denmark') %>% filter(year >= 1996)
+  df.in <- df.long %>% select(-country) %>% spread(variable,value) %>% mutate(date = ISOdate(year,month,day)) %>% select(-year,-month,-day) %>% select(date,flu,everything())
+  
+  
+  df.in.SE <- df.in %>% mutate(flu = flu / (mean(flu,na.rm=TRUE)*365/7))
+  
+  idx <- is.finite(df.in.SE$flu) & is.finite(df.in.SE$AH) 
+  df.in.SE <- df.in.SE[idx,]
+  block.SE <- make_block(df.in.SE[,c('flu','AH')],c(rep(1,E.SE),2),c(tp=tp.SE,0:-(E.SE-2),0) ) %>% as.data.frame()
+  block.norm.SE <- block.SE 
+  for(j in 1:NCOL(block.norm.SE)) 
+    block.norm.SE[,j] <- (block.norm.SE[,j] - mean(block.norm.SE[,j], na.rm = TRUE)) / sd(block.norm.SE[,j], na.rm = TRUE) 
+  
+  block.norm.SE <- data.frame(time = df.in.SE$date, block.norm.SE) 
+  
+  dAH.norm <- dAH / sd(block.SE$AH_t,na.rm=TRUE)
+  
+  pred.SE <- c(1,NROW(block.SE)) 
+  lib.SE <- pred.SE + NROW(block.SE)
+  
+  block.temp1 <- block.norm.SE %>% mutate(AH_t = AH_t + dAH.norm/2) %>% bind_rows(block.norm.SE)
+  
+  out <- block_lnlp(block=block.temp1, 
+                    lib = lib.SE, 
+                    pred = pred.SE,
+                    method = 's-map',
+                    tp = 0,
+                    num_neighbors = 0,
+                    columns = 1+(1:E.SE),
+                    target_column = 1,
+                    stats_only = FALSE,
+                    first_column_time = TRUE,
+                    exclusion_radius = 0,
+                    theta = theta.SE)[[1]]$model_output[1:NROW(block.SE),]
+  flu.pred.pos <- out$pred
+  
+  
+  
+  pred.SE <- c(1,NROW(block.SE)) 
+  
+  lib.SE <- pred.SE + NROW(block.SE)
+  
+  block.temp2 <- block.norm.SE %>% mutate(AH_t = AH_t - dAH.norm/2) %>% bind_rows(block.norm.SE)
+  
+  out <- block_lnlp(block=block.temp2,
+                    lib = lib.SE,
+                    pred = pred.SE,
+                    method = 's-map',
+                    tp = 0,
+                    num_neighbors = 0,
+                    columns = 1+(1:E.SE),
+                    target_column = 1,
+                    stats_only = FALSE, 
+                    first_column_time = TRUE,
+                    exclusion_radius = 0,
+                    theta = theta.SE)[[1]]$model_output[1:NROW(block.SE),]
+  flu.pred.neg <- out$pred
+  dFlu.pred <- flu.pred.pos - flu.pred.neg
+  dFlu.pred <- dFlu.pred * sd(block.SE$d_t+2,na.rm=TRUE)
+  
+  
+  
+  
+  
+  
+  
+  
